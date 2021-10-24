@@ -1,3 +1,4 @@
+import React from 'react'
 import { Container, Grid, InputAdornment, Paper, Typography } from '@mui/material/';
 import SearchIcon from '@mui/icons-material/SearchOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAddOutlined';
@@ -15,10 +16,20 @@ import { useHomeStyles } from './theme';
 import { Tweet } from '../../components/Tweet';
 import { SideMenu } from '../../components/SideMenu';
 import { SearchTextField } from '../../components/SearchTextField';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTweets } from '../../store/ducks/tweets/actionCreators';
+import { selectIsTweetsLoading, selectTweetsItems } from '../../store/ducks/tweets/selectors';
 
 export const Home = (): React.ReactElement => {
     const classes = useHomeStyles();
+    const dispatch = useDispatch();
+    const tweets = useSelector(selectTweetsItems);
+    const isLoading = useSelector(selectIsTweetsLoading);
+
+
+    React.useEffect(() => {
+        dispatch(fetchTweets());
+    }, [dispatch]);
 
 
     return (
@@ -41,7 +52,7 @@ export const Home = (): React.ReactElement => {
                         </Paper>
 
                         {/* redo */}
-                        {[
+                        {/* {[
                             ...new Array(20).fill(
                                 <Tweet
                                     text="Петиция чтобы в каждой пачке сухариков всегда лежал один большой в три слоя обсыпанный химическими специями царь-сухарик."
@@ -54,7 +65,16 @@ export const Home = (): React.ReactElement => {
                                     classes={classes}
                                 />,
                             ),
-                        ]}
+                        ]} */}
+                        {isLoading ? (
+                            <div className={classes.tweetsCentred}>
+                                <CircularProgress />
+                            </div>
+                        ) : (
+                            tweets.map((tweet) => (
+                                <Tweet key={tweet._id} text={tweet.text} user={tweet.user} classes={classes} />
+                            ))
+                        )}
                     </Paper>
                 </Grid>
                 <Grid sm={3} md={3} item>
