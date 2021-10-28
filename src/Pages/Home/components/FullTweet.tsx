@@ -1,5 +1,9 @@
 import CircularProgress from '@mui/material/CircularProgress';
 import React from 'react';
+import Avatar from '@mui/material/Avatar';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import classNames from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Tweet } from '../../../components/Tweet';
@@ -34,7 +38,29 @@ export const FullTweet: React.FC = (): React.ReactElement | null => {
     }
 
     if (tweetData) {
-        return <Tweet classes={classes} {...tweetData} />;
+        return (
+            <Paper className={classes.fullTweet}>
+                <div className={classNames(classes.tweetsHeaderUser)}>
+                    <Avatar
+                        className={classes.tweetAvatar}
+                        alt={`Аватарка пользователя ${tweetData.user.fullname}`}
+                        src={tweetData.user.avatarUrl}
+                    />
+                    <Typography>
+                        <b>{tweetData.user.fullname}</b>&nbsp;
+                        <div>
+                            <span className={classes.tweetUserName}>@{tweetData.user.username}</span>&nbsp;
+                            <span className={classes.tweetUserName}>·</span>&nbsp;
+                            <span className={classes.tweetUserName}>1 ч</span>
+                        </div>
+                    </Typography>
+                </div>
+                <Typography className={classes.fullTweetText} gutterBottom>
+                    {tweetData.text}
+                </Typography>
+            </Paper>
+        );
+
     }
 
     return null;
