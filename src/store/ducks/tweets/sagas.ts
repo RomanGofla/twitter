@@ -1,9 +1,10 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { TweetsApi } from '../../../services/api/tweetsApi';
-import { setTweets, setTweetsLoadingState, TweetsActionsType } from './actionCreators';
-import { LoadingState, Tweet } from './contracts/state';
+import { addTweet, setAddFormState, setTweets, setTweetsLoadingState } from './actionCreators';
+import { FetchAddTweetActionInterface, TweetsActionsType } from './contracts/actionTypes';
+import { AddFormState, LoadingState, Tweet, TweetsState } from './contracts/state';
 
-export function* fetchTweetsRequest(): Generator<unknown, void, Tweet[]> {
+export function* fetchTweetsRequest() {
   try {
     const items: Tweet[] = yield call(TweetsApi.fetchTweets);
     yield put(setTweets(items));
@@ -12,6 +13,34 @@ export function* fetchTweetsRequest(): Generator<unknown, void, Tweet[]> {
   }
 }
 
+export function* fetchAddTweetRequest({ payload }: FetchAddTweetActionInterface) {
+  try {
+    const data = {
+      _id: Math.random().toString(36).substr(2),
+      text: payload,
+      user: {
+        fullname: 'Brian Vaughn 🖤',
+        username: 'brian_d_vaughn',
+        avatarUrl: 'https://pbs.twimg.com/profile_images/1290320630521487362/UKVSbU2V_bigger.jpg',
+      },
+    };
+    const item: Tweet = yield call(TweetsApi.addTweet, data);
+    yield put(addTweet(item));
+  } catch (error) {
+    yield put(setAddFormState(AddFormState.ERROR));
+  }
+}
+
+// export function* fetchTweetsRequest(): Generator<unknown, void, Tweet[]> {
+//   try {
+//     const items: Tweet[] = yield call(TweetsApi.fetchTweets);
+//     yield put(setTweets(items));
+//   } catch (error) {
+//     yield put(setTweetsLoadingState(LoadingState.ERROR));
+//   }
+// }
+
 export function* tweetsSaga() {
   yield takeLatest(TweetsActionsType.FETCH_TWEETS, fetchTweetsRequest);
+  yield takeLatest(TweetsActionsType.FETCH_ADD_TWEET, fetchAddTweetRequest);
 }
